@@ -106,7 +106,7 @@
     return keychainItem;
 }
 
-- (void)deleteKeychainItemForService:(NSString *)serviceName account:(NSString *)accountName {
+- (void)deleteItemInKeychainForService:(NSString *)serviceName account:(NSString *)accountName {
     NSMutableDictionary *searchDictionary = [self keychainItemForServiceName:serviceName accountName:accountName];
     OSStatus status = SecItemDelete((CFDictionaryRef)searchDictionary);
     if (status == noErr) {
