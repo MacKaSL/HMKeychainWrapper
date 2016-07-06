@@ -46,9 +46,8 @@
 
 #pragma mark - Keychain
 
-
 - (void)saveItemInKeyChainForService:(NSString *)serviceName account:(NSString *)accountName secretString:(NSString *)secretStr type:(HMKeychainType)type {
-    NSData *secretData;
+    NSData *secretData = [[NSData alloc] init];
     if (type == HMKeychainTypeDeviceID) {
         NSString *vendor = [NSString stringWithFormat:@"%@",[[UIDevice currentDevice]identifierForVendor]];
         NSArray *formatted = [vendor componentsSeparatedByString:@">"];
@@ -56,7 +55,6 @@
         formattedString = [formattedString stringByReplacingOccurrencesOfString:@"-" withString:@""];
         formattedString = [formattedString stringByReplacingOccurrencesOfString:@" " withString:@""];
         secretData = [formattedString dataUsingEncoding:NSUTF8StringEncoding];
-        NSLog(@"HMKeychainWrapper - Device ID secret: %@",formattedString);
     } else {
         secretData = [secretStr dataUsingEncoding:NSUTF8StringEncoding];
     }
@@ -72,15 +70,18 @@
     OSStatus status = SecItemAdd((CFDictionaryRef)query, NULL);
     if (status == noErr) {
         NSLog(@"HMKeychainWrapper - Saved in keychain");
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:keychainSaved];
     } else {
-        NSLog(@"HMKeychainWrapper - Cannot save in keychain or already saved.");
+        if (![[self itemSavedInKeychainForService:serviceName account:accountName] isKindOfClass:[NSNull class]]) {
+            NSLog(@"HMKeychainWrapper - Saved Device ID secret: %@",[self itemSavedInKeychainForService:serviceName account:accountName]);
+        } else {
+            NSLog(@"HMKeychainWrapper - Cannot save in keychain or already saved.");
+        }
     }
 }
 
 - (NSString *)itemSavedInKeychainForService:(NSString *)serviceName account:(NSString *)accountName {
     OSStatus status;
-    NSMutableDictionary *keychainItem = [self keychainItemForKey:serviceName service:accountName];
+    NSMutableDictionary *keychainItem = [self keychainItemForServiceName:serviceName accountName:accountName];
     keychainItem[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
     keychainItem[(__bridge id)kSecReturnAttributes] = (__bridge id)kCFBooleanTrue;
     CFDictionaryRef result = nil;
@@ -96,17 +97,17 @@
     return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 }
 
-- (NSMutableDictionary *)keychainItemForKey:(NSString *)key service:(NSString *)service {
+- (NSMutableDictionary *)keychainItemForServiceName:(NSString *)serviceName accountName:(NSString *)accountName {
     NSMutableDictionary *keychainItem = [[NSMutableDictionary alloc] init];
     keychainItem[(__bridge id)kSecClass] = (__bridge id)kSecClassGenericPassword;
     keychainItem[(__bridge id)kSecAttrAccessible] = (__bridge id)kSecAttrAccessibleAlways;
-    keychainItem[(__bridge id)kSecAttrAccount] = key;
-    keychainItem[(__bridge id)kSecAttrService] = service;
+    keychainItem[(__bridge id)kSecAttrAccount] = accountName;
+    keychainItem[(__bridge id)kSecAttrService] = serviceName;
     return keychainItem;
 }
 
-- (void)deleteItemInKeychainForService:(NSString *)serviceName account:(NSString *)accountName {
-    NSMutableDictionary *searchDictionary = [self keychainItemForKey:serviceName service:accountName];
+- (void)deleteKeychainItemForService:(NSString *)serviceName account:(NSString *)accountName {
+    NSMutableDictionary *searchDictionary = [self keychainItemForServiceName:serviceName accountName:accountName];
     OSStatus status = SecItemDelete((CFDictionaryRef)searchDictionary);
     if (status == noErr) {
         NSLog(@"HMKeychainWrapper - Keychain item deleted for account name: %@",accountName);
@@ -114,5 +115,4 @@
         NSLog(@"HMKeychainWrapper - Cannot delete keychain item for account name: %@",accountName);
     }
 }
-
 @end
