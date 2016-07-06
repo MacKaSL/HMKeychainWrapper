@@ -60,4 +60,12 @@ typedef NS_ENUM(NSInteger, HMKeychainType){
  *  @return Saved string item
  */
 - (nullable NSString *)itemSavedInKeychainForService:(NSString * _Nonnull)serviceName account:(NSString * _Nonnull)accountName;
+
+/**
+ *  Deletes an item saved for the given service name and account name.
+ *
+ *  @param serviceName Used service name
+ *  @param accountName Used account name
+ */
+- (void)deleteItemInKeychainForService:(NSString * _Nonnull)serviceName account:(NSString * _Nonnull)accountName;
 @end

@@ -105,4 +105,14 @@
     return keychainItem;
 }
 
+- (void)deleteItemInKeychainForService:(NSString *)serviceName account:(NSString *)accountName {
+    NSMutableDictionary *searchDictionary = [self keychainItemForKey:serviceName service:accountName];
+    OSStatus status = SecItemDelete((CFDictionaryRef)searchDictionary);
+    if (status == noErr) {
+        NSLog(@"HMKeychainWrapper - Keychain item deleted for account name: %@",accountName);
+    } else {
+        NSLog(@"HMKeychainWrapper - Cannot delete keychain item for account name: %@",accountName);
+    }
+}
+
 @end
