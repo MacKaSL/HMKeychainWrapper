@@ -47,7 +47,7 @@
 #pragma mark - Keychain
 
 - (void)saveItemInKeyChainForService:(NSString *)serviceName account:(NSString *)accountName secretString:(NSString *)secretStr type:(HMKeychainType)type {
-    NSData *secretData = [[NSData alloc] init];
+    NSData *secretData;
     if (type == HMKeychainTypeDeviceID) {
         NSString *vendor = [NSString stringWithFormat:@"%@",[[UIDevice currentDevice]identifierForVendor]];
         NSArray *formatted = [vendor componentsSeparatedByString:@">"];
