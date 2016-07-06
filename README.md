@@ -1,2 +1,2 @@
 # HMKeychainWrapper
-Save keychain item and retrieve them easily with HMKeychainWrapper.
+Save keychain items and retrieve them easily with HMKeychainWrapper.
