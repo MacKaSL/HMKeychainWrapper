@@ -72,9 +72,9 @@
         NSLog(@"HMKeychainWrapper - Saved in keychain");
     } else {
         if (![[self itemSavedInKeychainForService:serviceName account:accountName] isKindOfClass:[NSNull class]]) {
-            NSLog(@"HMKeychainWrapper - Saved Device ID secret: %@",[self itemSavedInKeychainForService:serviceName account:accountName]);
+            NSLog(@"HMKeychainWrapper - Saved secret: %@",[self itemSavedInKeychainForService:serviceName account:accountName]);
         } else {
-            NSLog(@"HMKeychainWrapper - Cannot save in keychain or already saved.");
+            NSLog(@"HMKeychainWrapper - Cannot save secret in keychain or already saved.");
         }
     }
 }
